@@ -1,0 +1,27 @@
+# Personal AI CLI Configuration
+# This file contains all configurable settings for the personal-ai-cli.
+# You can override these values using environment variables prefixed with AI_
+# Example: AI_DEFAULT_MODEL=llama2 python chat.py
+
+# Data and database paths
+data_path: "data" # Directory containing your documents
+db_path: "db" # Directory to store the vector database
+
+# LLM settings
+default_model: "llama3" # Default Ollama model to use
+max_tokens: 512 # Maximum tokens in LLM response
+temperature: 0.1 # LLM temperature (0.0 = deterministic, 1.0 = creative)
+
+# Retrieval settings
+top_k: 3 # Number of similar chunks to retrieve
+chunk_size: 500 # Size of text chunks in characters
+chunk_overlap: 50 # Overlap between chunks in characters
+
+# Embedding model
+embedding_model: "all-MiniLM-L6-v2" # Sentence transformer model for embeddings
+
+# Supported file extensions (don't modify unless you add new loaders)
+supported_extensions:
+  - ".txt"
+  - ".md"
+  - ".pdf"
