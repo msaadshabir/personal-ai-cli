@@ -1,0 +1,6 @@
+langchain-community>=0.2.0
+chromadb>=0.4.22
+sentence-transformers>=2.2.0
+ollama>=0.1.8
+tqdm>=4.66.0
+pypdf>=3.0.0
