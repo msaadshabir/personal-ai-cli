@@ -85,9 +85,6 @@ AI_DEFAULT_MODEL=mistral AI_TEMPERATURE=0.3 python chat.py
 | `chunk_overlap`   | `50`                 | Overlap between chunks                |
 | `embedding_model` | `"all-MiniLM-L6-v2"` | Embedding model name                  |
 
-## Troubleshooting
-
-### Common Issues
 
 **"Vector database not found"**
 
