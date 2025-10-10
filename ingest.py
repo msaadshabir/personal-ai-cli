@@ -24,12 +24,12 @@ def validate_data_directory(data_path: str) -> bool:
     """Validate that the data directory exists and contains supported files."""
     data_dir = Path(data_path)
     if not data_dir.exists():
-        print(f"❌ Data directory '{data_path}' not found!")
-        print(f"👉 Create it and add {', '.join(config.get('supported_extensions'))} files.")
+        print(f"[ERROR] Data directory '{data_path}' not found!")
+        print(f"[HINT] Create it and add {', '.join(config.get('supported_extensions'))} files.")
         return False
 
     if not data_dir.is_dir():
-        print(f"❌ '{data_path}' is not a directory!")
+        print(f"[ERROR] '{data_path}' is not a directory!")
         return False
 
     # Check for supported files
@@ -38,7 +38,7 @@ def validate_data_directory(data_path: str) -> bool:
         supported_files.extend(list(data_dir.rglob(f"**/*{ext}")))
 
     if not supported_files:
-        print(f"⚠️ No supported files found in '{data_path}' directory!")
+        print(f"[WARNING] No supported files found in '{data_path}' directory!")
         print(f"Supported formats: {', '.join(config.get('supported_extensions'))}")
         return False
 
@@ -49,14 +49,14 @@ def load_documents(data_path: str) -> List[Document]:
     documents = []
     errors = []
 
-    print(f"🔍 Scanning '{data_path}' for documents...")
+    print(f"[SCANNING] Scanning '{data_path}' for documents...")
 
     # Load .md files
     try:
         loader_md = DirectoryLoader(data_path, glob="**/*.md", loader_cls=TextLoader)
         md_docs = loader_md.load()
         documents.extend(md_docs)
-        print(f"✅ Loaded {len(md_docs)} Markdown file(s)")
+        print(f"[SUCCESS] Loaded {len(md_docs)} Markdown file(s)")
     except Exception as e:
         error_msg = f"Failed to load Markdown files: {e}"
         logger.error(error_msg)
@@ -67,7 +67,7 @@ def load_documents(data_path: str) -> List[Document]:
         loader_txt = DirectoryLoader(data_path, glob="**/*.txt", loader_cls=TextLoader)
         txt_docs = loader_txt.load()
         documents.extend(txt_docs)
-        print(f"✅ Loaded {len(txt_docs)} text file(s)")
+        print(f"[SUCCESS] Loaded {len(txt_docs)} text file(s)")
     except Exception as e:
         error_msg = f"Failed to load text files: {e}"
         logger.error(error_msg)
@@ -78,14 +78,14 @@ def load_documents(data_path: str) -> List[Document]:
         loader_pdf = DirectoryLoader(data_path, glob="**/*.pdf", loader_cls=PyPDFLoader)
         pdf_docs = loader_pdf.load()
         documents.extend(pdf_docs)
-        print(f"✅ Loaded {len(pdf_docs)} PDF file(s)")
+        print(f"[SUCCESS] Loaded {len(pdf_docs)} PDF file(s)")
     except Exception as e:
         error_msg = f"Failed to load PDF files: {e}"
         logger.error(error_msg)
         errors.append(error_msg)
 
     if errors:
-        print(f"⚠️ Encountered {len(errors)} error(s) during loading:")
+        print(f"[WARNING] Encountered {len(errors)} error(s) during loading:")
         for error in errors:
             print(f"   - {error}")
 
@@ -96,7 +96,7 @@ def create_chunks(documents: List[Document]) -> List[Document]:
     if not documents:
         return []
 
-    print(f"📄 Splitting {len(documents)} document(s) into chunks...")
+    print(f"[PROCESSING] Splitting {len(documents)} document(s) into chunks...")
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=config.get('chunk_size'),
@@ -111,16 +111,16 @@ def create_chunks(documents: List[Document]) -> List[Document]:
             chunks.extend(doc_chunks)
             pbar.update(1)
 
-    print(f"✅ Created {len(chunks)} chunks")
+    print(f"[SUCCESS] Created {len(chunks)} chunks")
     return chunks
 
 def create_vectorstore(chunks: List[Document], db_path: str):
     """Create and persist the vector store with progress indication."""
     if not chunks:
-        print("⚠️ No chunks to process!")
+        print("[WARNING] No chunks to process!")
         return
 
-    print("🧠 Generating embeddings (this may take a while on first run)...")
+    print("[EMBEDDING] Generating embeddings (this may take a while on first run)...")
 
     embeddings = HuggingFaceEmbeddings(model_name=config.get('embedding_model'))
 
@@ -134,7 +134,7 @@ def create_vectorstore(chunks: List[Document], db_path: str):
         vectorstore.persist()
         pbar.update(1)
 
-    print(f"✅ Knowledge base saved to '{db_path}' ({len(chunks)} chunks)")
+    print(f"[SUCCESS] Knowledge base saved to '{db_path}' ({len(chunks)} chunks)")
 
 def main():
     """Main ingestion function."""
@@ -144,9 +144,9 @@ def main():
     data_path = config.get('data_path')
     db_path = config.get('db_path')
 
-    print("🚀 Starting data ingestion...")
-    print(f"📁 Data directory: {data_path}")
-    print(f"🗄️  Database path: {db_path}")
+    print("[STARTING] Starting data ingestion...")
+    print(f"[DIR] Data directory: {data_path}")
+    print(f"[DATABASE] Database path: {db_path}")
 
     # Validate data directory
     if not validate_data_directory(data_path):
@@ -155,7 +155,7 @@ def main():
     # Load documents
     documents = load_documents(data_path)
     if not documents:
-        print("❌ No documents could be loaded. Exiting.")
+        print("[ERROR] No documents could be loaded. Exiting.")
         return
 
     # Create chunks
@@ -164,7 +164,7 @@ def main():
     # Create vector store
     create_vectorstore(chunks, db_path)
 
-    print("🎉 Ingestion complete!")
+    print("[COMPLETE] Ingestion complete!")
 
 if __name__ == "__main__":
     main()

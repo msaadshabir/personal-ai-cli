@@ -37,7 +37,7 @@ class Config:
                 config.update(user_config)
                 return config
             except Exception as e:
-                print(f"⚠️ Warning: Could not load config file {self.config_file}: {e}")
+                print(f"[WARNING] Warning: Could not load config file {self.config_file}: {e}")
                 print("Using default configuration.")
                 return self._defaults.copy()
         else:
@@ -72,9 +72,9 @@ class Config:
             try:
                 with open(self.config_file, 'w') as f:
                     yaml.dump(self._defaults, f, default_flow_style=False, sort_keys=False)
-                print(f"✅ Created default configuration file: {self.config_file}")
+                print(f"[SUCCESS] Created default configuration file: {self.config_file}")
             except Exception as e:
-                print(f"⚠️ Warning: Could not create config file {self.config_file}: {e}")
+                print(f"[WARNING] Warning: Could not create config file {self.config_file}: {e}")
 
 # Global config instance
 config = Config()

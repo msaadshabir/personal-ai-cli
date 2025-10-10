@@ -26,7 +26,7 @@ def validate_input(text: str, max_length: int = 1000) -> bool:
 
     # Check length
     if len(text.strip()) > max_length:
-        print(f"❌ Input too long! Maximum {max_length} characters allowed.")
+        print(f"[ERROR] Input too long! Maximum {max_length} characters allowed.")
         return False
 
     # Check for potentially harmful patterns (basic check)
@@ -40,7 +40,7 @@ def validate_input(text: str, max_length: int = 1000) -> bool:
     text_lower = text.lower()
     for pattern in dangerous_patterns:
         if re.search(pattern, text_lower):
-            print("❌ Potentially unsafe input detected.")
+            print("[ERROR] Potentially unsafe input detected.")
             return False
 
     return True
@@ -48,8 +48,8 @@ def validate_input(text: str, max_length: int = 1000) -> bool:
 def check_db(db_path: str) -> bool:
     """Check if vector database exists."""
     if not os.path.exists(db_path):
-        print("❌ Vector database not found!")
-        print("👉 Run 'python ingest.py' first to load your data.")
+        print("[ERROR] Vector database not found!")
+        print("[HINT] Run 'python ingest.py' first to load your data.")
         return False
     return True
 
@@ -67,8 +67,8 @@ def test_ollama(model_name: str) -> Optional[Ollama]:
         return llm
     except Exception as e:
         logger.error(f"Failed to connect to Ollama with model '{model_name}': {e}")
-        print(f"❌ Failed to connect to Ollama with model '{model_name}': {e}")
-        print("\n💡 Please install Ollama: https://ollama.com/")
+        print(f"[ERROR] Failed to connect to Ollama with model '{model_name}': {e}")
+        print("\n[TIP] Please install Ollama: https://ollama.com/")
         print(f"Then run: ollama pull {model_name}")
         print("\nAlternatively, check your Ollama service is running with: ollama serve")
         return None
@@ -107,8 +107,8 @@ def main():
     if not check_db(db_path):
         sys.exit(1)
 
-    print(f"💬 Starting Personal AI CLI (model: {model})")
-    print("📘 Ask questions about yourself. Type 'exit', 'quit', or 'q' to quit.\n")
+    print(f"[CHAT] Starting Personal AI CLI (model: {model})")
+    print("[INFO] Ask questions about yourself. Type 'exit', 'quit', or 'q' to quit.\n")
 
     # Load vector DB
     try:
@@ -116,7 +116,7 @@ def main():
         vectorstore = Chroma(persist_directory=db_path, embedding_function=embeddings)
     except Exception as e:
         logger.error(f"Failed to load vector database: {e}")
-        print(f"❌ Failed to load vector database: {e}")
+        print(f"[ERROR] Failed to load vector database: {e}")
         print("Try re-running 'python ingest.py' to rebuild the database.")
         sys.exit(1)
 
@@ -130,7 +130,7 @@ def main():
         qa_chain = create_qa_chain(llm, vectorstore)
     except Exception as e:
         logger.error(f"Failed to create QA chain: {e}")
-        print(f"❌ Failed to initialize chat system: {e}")
+        print(f"[ERROR] Failed to initialize chat system: {e}")
         sys.exit(1)
 
     # Chat loop
@@ -140,7 +140,7 @@ def main():
 
             # Check for exit commands
             if user_input.lower() in {"exit", "quit", "q"}:
-                print("👋 Goodbye!")
+                print("[GOODBYE] Goodbye!")
                 break
 
             # Validate input
@@ -155,20 +155,20 @@ def main():
                 print(response["result"].strip())
             except Exception as e:
                 logger.error(f"Error during query processing: {e}")
-                print(f"❌ Sorry, I encountered an error processing your question: {e}")
+                print(f"[ERROR] Sorry, I encountered an error processing your question: {e}")
                 print("Please try rephrasing your question.")
 
             print()
 
         except KeyboardInterrupt:
-            print("\n\n👋 Goodbye!")
+            print("\n\n[GOODBYE] Goodbye!")
             break
         except EOFError:
-            print("\n\n👋 Goodbye!")
+            print("\n\n[GOODBYE] Goodbye!")
             break
         except Exception as e:
             logger.error(f"Unexpected error in chat loop: {e}")
-            print(f"\n⚠️ Unexpected error: {e}\n")
+            print(f"\n[WARNING] Unexpected error: {e}\n")
 
 if __name__ == "__main__":
     main()
