@@ -1,5 +1,12 @@
 # personal-ai-cli
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![LangChain](https://img.shields.io/badge/LangChain-0.2+-green.svg)](https://github.com/langchain-ai/langchain)
+[![Ollama](https://img.shields.io/badge/Ollama-Compatible-orange.svg)](https://ollama.com/)
+[![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector%20Store-purple.svg)](https://www.trychroma.com/)
+
 Terminal based, open-source, self-hosted personal AI chatbot that anyone can use with their own data. No UI, no cloud, no tracking.
 
 ## Features
@@ -84,7 +91,6 @@ AI_DEFAULT_MODEL=mistral AI_TEMPERATURE=0.3 python chat.py
 | `chunk_size`      | `500`                | Text chunk size in characters         |
 | `chunk_overlap`   | `50`                 | Overlap between chunks                |
 | `embedding_model` | `"all-MiniLM-L6-v2"` | Embedding model name                  |
-
 
 **"Vector database not found"**
 
