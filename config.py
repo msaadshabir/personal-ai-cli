@@ -22,7 +22,7 @@ class Config:
             "max_tokens": 512,
             "temperature": 0.1,
             "top_k": 3,
-            "supported_extensions": [".txt", ".md", ".pdf"]
+            "supported_extensions": [".txt", ".md", ".pdf", ".docx", ".html", ".json", ".csv", ".epub"]
         }
         self._config = self._load_config()
 

@@ -20,8 +20,13 @@ chunk_overlap: 50 # Overlap between chunks in characters
 # Embedding model
 embedding_model: "all-MiniLM-L6-v2" # Sentence transformer model for embeddings
 
-# Supported file extensions (don't modify unless you add new loaders)
+# Supported file extensions
 supported_extensions:
   - ".txt"
   - ".md"
   - ".pdf"
+  - ".docx"
+  - ".html"
+  - ".json"
+  - ".csv"
+  - ".epub"

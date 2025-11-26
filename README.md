@@ -11,14 +11,19 @@ Terminal based, open-source, self-hosted personal AI chatbot that anyone can use
 
 ## Features
 
-- Supports .txt, .md, and .pdf files
-- Local vector database (ChromaDB)
-- Local embeddings (sentence-transformers)
-- Local LLM via Ollama
-- Retrieval-Augmented Generation (RAG)
-- Configurable settings via YAML or environment variables
-- Robust error handling and progress indicators
-- Input validation and security checks
+- **Streaming Responses** - Token-by-token streaming for real-time output
+- **Conversation Memory** - Maintains context across your chat session
+- **Source Citations** - See which documents were used to generate answers
+- **Rich Terminal UI** - Beautiful colored output with progress indicators
+- **Multi-Model Support** - Switch between Ollama models mid-conversation
+- **Many File Formats** - Supports .txt, .md, .pdf, .docx, .html, .json, .csv, .epub
+- **Incremental Ingestion** - Only re-processes changed files
+- **Chat History Export** - Export conversations to JSON or Markdown
+- **CLI Arguments** - Full command-line interface with flags
+- **Retry Logic** - Automatic retry with exponential backoff
+- **Input Validation** - Security checks on user input
+- **Configurable** - YAML config with environment variable overrides
+- **Unit Tests** - Comprehensive test suite with pytest
 
 ## Installation
 
@@ -29,9 +34,35 @@ Terminal based, open-source, self-hosted personal AI chatbot that anyone can use
    ```
 
 2. Install Ollama: https://ollama.com/
+
    ```bash
    # Pull a model (default is llama3)
    ollama pull llama3
+   ```
+
+3. (Optional) Install additional document loaders:
+
+   ```bash
+   # For .docx support
+   pip install docx2txt
+
+   # For .epub support
+   pip install ebooklib
+   ```
+
+## Quick Start
+
+1. Add your personal documents to the `data/` directory.
+
+2. Ingest your data:
+
+   ```bash
+   python ingest.py
+   ```
+
+3. Start chatting:
+   ```bash
+   python chat.py
    ```
 
 ## Configuration
@@ -42,6 +73,7 @@ The application uses a `config.yaml` file for settings. A default configuration 
 - **LLM settings**: Model, temperature, max tokens
 - **Retrieval settings**: Chunk size, overlap, number of results
 - **Embedding model**: Which sentence transformer to use
+- **Supported extensions**: File types to process
 
 ### Environment Variable Overrides
 
@@ -58,25 +90,47 @@ AI_CHUNK_SIZE=1000 python ingest.py
 AI_DEFAULT_MODEL=mistral AI_TEMPERATURE=0.3 python chat.py
 ```
 
-## Usage
+## Command Line Options
 
-1. Add your personal documents (.txt, .md, .pdf) to the `data/` directory.
+### Chat (chat.py)
 
-2. Ingest your data into the vector database:
+```bash
+python chat.py [OPTIONS]
 
-   ```bash
-   python ingest.py
-   ```
+Options:
+  -m, --model MODEL    Ollama model to use (overrides config)
+  -c, --config FILE    Path to configuration file
+  -v, --verbose        Enable verbose output
+  --debug              Enable debug mode with full stack traces
+  --clear-db           Clear the vector database and exit
+  --no-stream          Disable streaming responses
+  --no-sources         Disable source citation display
+```
 
-   This will show progress indicators and detailed status messages.
+### Ingest (ingest.py)
 
-3. Start chatting:
+```bash
+python ingest.py [OPTIONS]
 
-   ```bash
-   python chat.py
-   ```
+Options:
+  -f, --force          Force re-ingestion of all files (ignore hashes)
+  -v, --verbose        Enable verbose output
+  --debug              Enable debug mode with full stack traces
+```
 
-   The chat interface includes input validation and error handling.
+## Chat Commands
+
+During a chat session, you can use these commands:
+
+| Command              | Description                        |
+| -------------------- | ---------------------------------- |
+| `/model <name>`      | Switch to a different Ollama model |
+| `/models`            | List suggested models              |
+| `/export [json\|md]` | Export chat history to file        |
+| `/clear`             | Clear conversation history         |
+| `/sources`           | Toggle source citation display     |
+| `/help`              | Show available commands            |
+| `exit`, `quit`, `q`  | Exit the chat                      |
 
 ## Configuration Options
 
@@ -92,6 +146,36 @@ AI_DEFAULT_MODEL=mistral AI_TEMPERATURE=0.3 python chat.py
 | `chunk_overlap`   | `50`                 | Overlap between chunks                |
 | `embedding_model` | `"all-MiniLM-L6-v2"` | Embedding model name                  |
 
+## Supported File Types
+
+| Extension | Format     | Notes                       |
+| --------- | ---------- | --------------------------- |
+| `.txt`    | Plain text | Basic text files            |
+| `.md`     | Markdown   | Markdown formatted files    |
+| `.pdf`    | PDF        | Portable Document Format    |
+| `.docx`   | Word       | Requires `docx2txt` package |
+| `.html`   | HTML       | Web pages                   |
+| `.json`   | JSON       | Structured data             |
+| `.csv`    | CSV        | Comma-separated values      |
+| `.epub`   | EPUB       | Ebooks, requires `ebooklib` |
+
+## Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=. --cov-report=html
+
+# Run specific test file
+pytest tests/test_config.py -v
+```
+
+## Troubleshooting
+
+## Troubleshooting
+
 **"Vector database not found"**
 
 - Run `python ingest.py` first to create the database
@@ -104,16 +188,44 @@ AI_DEFAULT_MODEL=mistral AI_TEMPERATURE=0.3 python chat.py
 
 **"No supported files found"**
 
-- Check that files have the correct extensions (.txt, .md, .pdf)
+- Check that files have the correct extensions
 - Ensure files are in the `data/` directory
 
 **Import errors**
 
 - Install dependencies: `pip install -r requirements.txt`
 
+**Debug mode**
+
+- Run with `--debug` flag for full stack traces: `python chat.py --debug`
+
+### Chat History Export
+
+Conversations are exported to the `chat_history/` directory:
+
+```bash
+# Export as JSON
+/export json
+
+# Export as Markdown
+/export md
+```
+
+### Incremental Ingestion
+
+The system tracks file changes using SHA256 hashes stored in `file_hashes.json`. Only modified or new files are re-ingested:
+
+```bash
+# Normal run (incremental)
+python ingest.py
+
+# Force full re-ingestion
+python ingest.py --force
+```
+
 ### Logs
 
-The application logs detailed information to help with troubleshooting. Check the console output for error messages and warnings.
+The application logs detailed information to help with troubleshooting. Use `--verbose` or `--debug` flags for more output.
 
 ## License
 
